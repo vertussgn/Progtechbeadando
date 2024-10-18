@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="hu"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">connect4-game</a> &gt; <a href="index.source.html" class="el_package">org.connect4</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package org.connect4;
+
+import java.util.Random;
+import java.util.Scanner;
+
+/**
+ * A Connect 4 játékot reprezentálja, beleértve a játékosokat és a játékmenetet.
+ */
+public final class Game {
+    /** A játéktábla oszlopainek száma. */
+    private static final int TOTAL_COLUMNS = 7;
+
+    /** AI ellen játszás választása. */
+    private static final int AI_MODE = 2;
+
+    /** Játék betöltése fájlból választása. */
+    private static final int LOAD_FROM_FILE_MODE = 3;
+
+    /** A játéktábla. */
+    private final Board board;
+
+    /** Az első játékos. */
+    private final Player firstPlayer;
+
+    /** A második játékos. */
+    private final Player secondPlayer;
+
+    /** Az éppen aktuális játékos. */
+    private Player currentPlayer;
+
+    /** Véletlenszám-generátor az AI lépésekhez. */
+    private final Random random;
+
+    /** Megmutatja, hogy a játék AI ellen zajlik-e. */
+    private final boolean isPlayingAgainstAI;
+
+    /**
+     * Létrehoz egy új Game-t megadott játékosokkal és móddal.
+     *
+     * @param player1 Az első játékos.
+     * @param player2 A második játékos.
+     * @param playAgainstAI Megmutatja, hogy a játék AI ellen zajlik-e.
+     */
+    public Game(
+            final Player player1,
+            final Player player2,
+<span class="fc" id="L47">            final boolean playAgainstAI) {</span>
+<span class="fc" id="L48">        this.board = new Board();</span>
+<span class="fc" id="L49">        this.firstPlayer = player1;</span>
+<span class="fc" id="L50">        this.secondPlayer = player2;</span>
+<span class="fc" id="L51">        this.isPlayingAgainstAI = playAgainstAI;</span>
+<span class="fc" id="L52">        this.currentPlayer = player1;</span>
+<span class="fc" id="L53">        this.random = new Random();</span>
+<span class="fc" id="L54">    }</span>
+    /**
+     * Első játékos public verzió, teszteléshez.
+     * @return Az első játékos {@link Player}
+     */
+    public Player getFirstPlayer() {
+<span class="fc" id="L60">        return firstPlayer;</span>
+    }
+
+    /**
+     * Második játékos public verzió, teszteléshez.
+     * @return A második játékos {@link Player}
+     */
+    public Player getSecondPlayer() {
+<span class="fc" id="L68">        return secondPlayer;</span>
+    }
+
+    /**
+     * Aktuális játékos, teszteléshez.
+     * @return Az aktuális játékos {@link Player}.
+     */
+    public Player getCurrentPlayer() {
+<span class="fc" id="L76">        return currentPlayer;</span>
+    }
+
+    /**
+     * A játék AI ellen zajlik-e, teszteléshez.
+     * @return Igaz, ha a játék AI ellen zajlik
+     */
+    public boolean isPlayingAgainstAI() {
+<span class="fc" id="L84">        return isPlayingAgainstAI;</span>
+    }
+
+    /**
+     * Getboard a teszteléshez.
+     * @return A játék táblája {@link Board}
+     */
+    public Board getBoard() {
+<span class="fc" id="L92">        return board;</span>
+    }
+
+
+    /**
+     * Beállítja a játékot a felhasználói választás alapján.
+     *
+     * @param choice A felhasználó választása a játékmódhoz.
+     * @param scanner Az inputhoz használt scanner.
+     * @return Egy új Game példány.
+     */
+    public static Game setupGame(final int choice, final Scanner scanner) {
+<span class="fc" id="L104">        boolean playAgainstAI = false; // Ai-e?</span>
+<span class="fc" id="L105">        boolean loadFromFile = false;</span>
+        // Játékállapot fájból:
+        String player1Name; // Az 1. játékos neve
+        String player2Name; // A 2. játékos neve
+
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">        switch (choice) {</span>
+            case 1:
+<span class="fc" id="L112">                System.out.print(&quot;Add meg az 1. játékos nevét: &quot;);</span>
+<span class="fc" id="L113">                player1Name = scanner.nextLine();</span>
+<span class="fc" id="L114">                System.out.print(&quot;Add meg a 2. játékos nevét: &quot;);</span>
+<span class="fc" id="L115">                player2Name = scanner.nextLine();</span>
+<span class="fc" id="L116">                break;</span>
+            case AI_MODE: // mágikus szám
+<span class="fc" id="L118">                playAgainstAI = true;</span>
+<span class="fc" id="L119">                System.out.print(&quot;Add meg a játékos nevét: &quot;);</span>
+<span class="fc" id="L120">                player1Name = scanner.nextLine();</span>
+<span class="fc" id="L121">                player2Name = &quot;AI&quot;;</span>
+<span class="fc" id="L122">                break;</span>
+            case LOAD_FROM_FILE_MODE: // mágikus szám használ
+<span class="nc" id="L124">                loadFromFile = true;</span>
+<span class="nc" id="L125">                System.out.print(&quot;Add meg az 1. játékos nevét: &quot;);</span>
+<span class="nc" id="L126">                player1Name = scanner.nextLine();</span>
+<span class="nc" id="L127">                System.out.print(&quot;Add meg a 2. játékos nevét: &quot;);</span>
+<span class="nc" id="L128">                player2Name = scanner.nextLine();</span>
+<span class="nc" id="L129">                break;</span>
+            default:
+<span class="fc" id="L131">                throw new IllegalArgumentException(&quot;Érvénytelen választás!&quot;);</span>
+        }
+
+<span class="fc" id="L134">        Game game = new Game(</span>
+                new Player(player1Name, 'X'),
+                new Player(player2Name, 'O'),
+                playAgainstAI
+        );
+
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (loadFromFile) {</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            if (!game.loadGameState()) {</span>
+<span class="nc" id="L142">                System.out.println(</span>
+                        &quot;A mentett játékállapot nem található. &quot;
+                                + &quot;Új játék indítása.&quot;
+                );
+            } else {
+<span class="nc" id="L147">                System.out.println(&quot;Játékállapot betöltve a fájlból.&quot;);</span>
+            }
+        }
+
+<span class="fc" id="L151">        return game;</span>
+    }
+
+
+
+    /**
+     * Elindítja a játék ciklust.
+     */
+    public void start() {
+<span class="fc" id="L160">        boolean gameWon = false;</span>
+
+<span class="pc bpc" id="L162" title="1 of 4 branches missed.">        while (!gameWon &amp;&amp; !board.isFull()) {</span>
+<span class="fc" id="L163">            board.print();</span>
+<span class="fc" id="L164">            int col = getCurrentPlayerInput();</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">            if (col == -1) {</span>
+<span class="nc" id="L166">                saveGameState();</span>
+<span class="nc" id="L167">                continue;</span>
+            }
+
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">            if (board.dropToken(col, currentPlayer.getToken())) {</span>
+<span class="fc" id="L171">                gameWon = checkWin();</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">                if (!gameWon) {</span>
+<span class="nc" id="L173">                    switchPlayer();</span>
+                }
+            } else {
+<span class="nc" id="L176">                System.out.println(&quot;A választott oszlop tele van! &quot;</span>
+                        + &quot;Válassz másik oszlopot.&quot;);
+            }
+<span class="fc" id="L179">        }</span>
+
+<span class="fc" id="L181">        board.print();</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        System.out.println(gameWon ? &quot;A(z) &quot;</span>
+<span class="pc" id="L183">                + currentPlayer.getName() + &quot; nyert!&quot; : &quot;Döntetlen!&quot;);</span>
+<span class="fc" id="L184">    }</span>
+
+    /**
+     * Megkapja az aktuális játékos inputját.
+     *
+     * @return A kiválasztott oszlop vagy -1 a mentéshez.
+     */
+    public int getCurrentPlayerInput() {
+<span class="pc bpc" id="L192" title="1 of 4 branches missed.">        if (!isPlayingAgainstAI || currentPlayer.equals(firstPlayer)) {</span>
+<span class="fc" id="L193">            return getPlayerInput();</span>
+        } else {
+<span class="nc" id="L195">            return getRandomAIInput();</span>
+        }
+    }
+
+    /**
+     * Megkérdi a játékost mit szeretne.
+     *
+     * @return A kiválasztott oszlop.
+     */
+    public int getPlayerInput() {
+<span class="fc" id="L205">        Scanner scanner = new Scanner(System.in);</span>
+        String input;
+        do {
+<span class="fc" id="L208">            System.out.print(&quot;A(z) &quot;</span>
+<span class="fc" id="L209">                    + currentPlayer.getName() + &quot; (&quot; + currentPlayer.getToken()</span>
+                    + &quot;) játékos, válassz egy oszlopot (0-6),&quot;
+                    + &quot;vagy írd be 's' a mentéshez: &quot;);
+<span class="fc" id="L212">            input = scanner.nextLine().trim();</span>
+
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">            if (input.equalsIgnoreCase(&quot;s&quot;)) {</span>
+<span class="nc" id="L215">                return -1;</span>
+            }
+
+            try {
+<span class="fc" id="L219">                int col = Integer.parseInt(input);</span>
+<span class="pc bpc" id="L220" title="2 of 4 branches missed.">                if (col &gt;= 0 &amp;&amp; col &lt; TOTAL_COLUMNS) {</span>
+<span class="fc" id="L221">                    return col;</span>
+                }
+<span class="fc" id="L223">            } catch (NumberFormatException e) {</span>
+                // Érvénytelen bemenet figyelmen kívül hagyása
+<span class="nc" id="L225">            }</span>
+
+<span class="fc" id="L227">            System.out.println(&quot;Érvénytelen bemenet! &quot;</span>
+                    + &quot;Válassz egy oszlopot 0-6 között, &quot;
+                    + &quot;vagy írd be az 's' betűt a mentéshez.&quot;);
+<span class="fc" id="L230">        } while (true);</span>
+    }
+
+    /**
+     * Véletlenszerű oszlopot ad vissza az AI.
+     *
+     * @return Egy véletlenszerű oszlopszám returnje.
+     */
+    private int getRandomAIInput() {
+<span class="nc" id="L239">        System.out.println(&quot;Az AI lép...&quot;);</span>
+<span class="nc" id="L240">        return random.nextInt(TOTAL_COLUMNS);</span>
+    }
+
+    /**
+     * Aktuális játékos cseréje.
+     */
+    void switchPlayer() {
+<span class="fc bfc" id="L247" title="All 2 branches covered.">        currentPlayer = (currentPlayer.equals(firstPlayer))</span>
+<span class="fc" id="L248">                ? secondPlayer</span>
+<span class="fc" id="L249">                : firstPlayer;</span>
+
+<span class="fc" id="L251">    }</span>
+
+    /**
+     * Ellenőrzi a nyerési feltételt.
+     *
+     * @return Igaz, ha az aktuális játékos nyert ha nem, hamis.
+     */
+    private boolean checkWin() {
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">        return board.checkHorizontalWin(currentPlayer)</span>
+                ||
+<span class="nc bnc" id="L261" title="All 2 branches missed.">                board.checkVerticalWin(currentPlayer)</span>
+                ||
+<span class="pc bnc" id="L263" title="All 2 branches missed.">                board.checkDiagonalWin(currentPlayer);</span>
+    }
+
+    /**
+     * Betölti a játékállapotot egy fájlból.
+     *
+     * @return Igaz, ha a sikeresen be lett töltve,
+     * hamis ha nem sikerült.
+     */
+    private boolean loadGameState() {
+<span class="nc" id="L273">        Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L274">        System.out.print(&quot;Add meg a betöltendő fájl nevét &quot;</span>
+                + &quot;(pl. gamestate.txt): &quot;);
+<span class="nc" id="L276">        String fileName = scanner.nextLine();</span>
+
+<span class="nc" id="L278">        return board.loadStateFromFile(fileName);</span>
+    }
+
+    /**
+     * Az aktuális játékállapot mentése egy fájlba.
+     * Metódus megkérdezi a felhasználót egy fájlnevről, és elmenti a
+     * jelenlegi táblát és játékosinformációkat
+     * a megadott fájlba.
+     */
+    private void saveGameState() {
+<span class="nc" id="L288">        Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L289">        System.out.print(&quot;Add meg a fájl nevét, ahová menteni &quot;</span>
+                + &quot;szeretnéd a játékállapotot &quot;
+                + &quot;(pl. gamestate.txt): &quot;);
+<span class="nc" id="L292">        String fileName = scanner.nextLine();</span>
+
+<span class="nc" id="L294">        board.saveStateToFile(fileName);</span>
+<span class="nc" id="L295">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
